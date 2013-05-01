@@ -1,0 +1,60 @@
+#
+# @file makefile for creating Algodoo translation files
+# @author @tatt61880   tatt61880@gmail.com
+# @date Last Modified: 2013/05/02 01:20:27.
+#
+
+## eval FONT = ...
+INCLUDE_FILE = input\\font.mk
+include input\\font.mk
+##
+MY_FONT = $(FONT)
+
+# ターゲットを出力する、ユーティリティ。
+EchoTarget = @echo $@:
+
+# folders
+INPUT = input
+OUTPUT = output
+SOURCE = src
+
+# perl sources
+SRC = $(SOURCE)\\chartableimage_creator.pl
+
+# input files
+TTF = $(INPUT)\\$(FONT).ttf
+CHAR_TABLE = $(INPUT)\\chartable.txt
+
+# output files
+RAW = "$(OUTPUT)\\$(MY_FONT).png"
+# =============================================================================
+
+# Phun Edition -------------------
+
+all: $(RAW)
+
+$(RAW): $(SRC) $(TTF) $(CHAR_TABLE) $(INCLUDE_FILE)
+	$(EchoTarget)
+	if not exist $(@D) mkdir $(@D)
+	perl $(SRC) -o $@ --char_table $(CHAR_TABLE) --input $(TTF)
+	@echo.
+
+.PHONY: clean
+clean:
+	if exist $(OUTPUT) rmdir /S /Q $(OUTPUT)
+
+.PHONY: zip
+zip: $(FOR_DAT) $(FOR_CFG) $(FOR_IMG) $(FOR_PHI) makefile
+	perl zip_this_project.pl
+
+.PHONY: help
+help:
+	@echo '----------------- ターゲット一覧 ------------------------'
+	@echo '- raw   : 字形ファイルを 作成する。
+	@echo '
+	@echo '- clean   : 生成物 (outputフォルダとその中身) を 削除する。
+	@echo '- help    : このメッセージを 出力する。
+
+.PHONY: raw
+raw: $(RAW)
+
